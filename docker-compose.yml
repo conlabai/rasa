@@ -52,16 +52,6 @@ services:
       - NLG_DEBUG
       - NLG_CHATWOOT_REFRESH_SECONDS
       - NLG_DOMAIN_PATH=/app/domain.yml
-      - DD_SERVICE=rasa-nlg
-      - DD_ENV
-      - DD_PROFILING_ENABLED
-      - DD_APM_ENABLED
-      - DD_TRACE_AGENT_PORT
-      - DD_AGENT_HOST
-    labels:
-      - com.datadoghq.tags.env=dev
-      - com.datadoghq.tags.service=rasa-nlg
-      - com.datadoghq.tags.version=1.0
     entrypoint: ["python"]
     command: ["nlg_server.py", "--workers", "1"]
     networks:
