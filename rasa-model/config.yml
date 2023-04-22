@@ -1,1 +1,81 @@
-rasa-model/config.yml
+# Configuration for Rasa NLU.
+# https://rasa.com/docs/rasa/nlu/components/
+recipe: default.v1
+language: ru
+
+pipeline:
+  - name: "SpacyNLP"
+    model: "ru_core_news_lg"
+    case_sensitive: False
+  - name: "SpacyTokenizer"
+    "intent_tokenization_flag": True
+    "intent_split_symbol": "+"
+    "token_pattern": None
+  - name: "SpacyFeaturizer"
+    "pooling": "mean"
+  - name: "RegexFeaturizer"
+    "case_sensitive": False
+    "use_word_boundaries": True
+  - name: "CountVectorsFeaturizer"
+  - name: DIETClassifier
+    epochs: 75
+    batch_strategy: "sequence"
+    similarity_type: "inner"
+    maximum_positive_similarity: 0.9
+    maximum_negative_similarity: 0
+    constrain_similarities: true
+    model_confidence: "softmax"
+    ranking_length: 3
+    entity_recognition: True
+    evaluate_every_number_of_epochs: -1
+    use_masked_language_model: True
+  #- name: "SpacyEntityExtractor"
+  # dimensions to extract
+  #  dimensions: ["LOC"]
+  - name: EntitySynonymMapper 
+  - name: FallbackClassifier
+    threshold: 0.5
+
+
+# # No configuration for the NLU pipeline was provided. The following default pipeline was used to train your model.
+# # If you'd like to customize it, uncomment and adjust the pipeline.
+# # See https://rasa.com/docs/rasa/tuning-your-model for more information.
+#   - name: WhitespaceTokenizer
+#   - name: RegexFeaturizer
+#   - name: LexicalSyntacticFeaturizer
+#   - name: CountVectorsFeaturizer
+#   - name: CountVectorsFeaturizer
+#     analyzer: char_wb
+#     min_ngram: 1
+#     max_ngram: 4
+#   - name: DIETClassifier
+#     epochs: 100
+#     constrain_similarities: true
+#   - name: EntitySynonymMapper
+#   - name: ResponseSelector
+#     epochs: 100
+#     constrain_similarities: true
+#   - name: FallbackClassifier
+#     threshold: 0.3
+#     ambiguity_threshold: 0.1
+
+# Configuration for Rasa Core.
+# https://rasa.com/docs/rasa/core/policies/
+policies:
+# # No configuration for policies was provided. The following default policies were used to train your model.
+# # If you'd like to customize them, uncomment and adjust the policies.
+# # See https://rasa.com/docs/rasa/policies for more information.
+  - name: MemoizationPolicy
+    max_history: 5
+  - name: RulePolicy
+    core_fallback_threshold: 0.3
+    core_fallback_action_name: "action_default_fallback_and_handoff"
+    enable_fallback_prediction: false
+  #- name: UnexpecTEDIntentPolicy
+  #  max_history: 5
+  #  epochs: 50
+  - name: TEDPolicy
+    max_history: 5
+    epochs: 50
+    constrain_similarities: true
+    use_gpu: False
