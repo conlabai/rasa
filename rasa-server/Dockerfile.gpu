@@ -1,0 +1,36 @@
+# Python version we use
+ARG PYVERSION=3.8
+# the tensorflow gpu image we use (tf version needs to match rasa version!)
+FROM tensorflow/tensorflow:2.8.4-gpu 
+ARG PYVERSION
+
+# install dependencies of interest
+USER root
+COPY requirements.txt .
+RUN python -m pip install --upgrade pip && \
+    python -m pip install -r requirements.txt && \
+    python -m spacy download ru_core_news_lg
+
+# set workdir and copy data files from disk
+# note the latter command uses .dockerignore
+
+WORKDIR /app
+ENV HOME=/app
+
+COPY . .
+# patch validator so it doesn't fail on utterances with no template
+# COPY ./validator.py /usr/local/lib/python${PYVERSION}/dist-packages/rasa/validator.py
+
+# make sure the container process can write to .rasa directory
+RUN mkdir .rasa || true
+RUN mkdir models || true
+RUN mkdir .config || true
+RUN chown -R 1000 .rasa models .config
+# set the user to run, don't run as root
+USER 1000
+
+# set entrypoint for interactive shells
+ENTRYPOINT ["rasa"]
+
+# command to run when container is called to run
+CMD ["run", "--enable-api", "--port", "8080"]

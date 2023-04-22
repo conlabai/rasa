@@ -1,0 +1,2 @@
+rasa_sdk==3.5.1
+aiohttp==3.8.4

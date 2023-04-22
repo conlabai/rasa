@@ -1,0 +1,67 @@
+version: "3.1"
+actions:
+- action_handoff
+- action_hello_world
+- action_tag_conversation
+- action_default_fallback_and_handoff
+- action_handoff_notification
+- utter_ask_how_we_can_help
+- utter_well_wish
+- utter_doponitelniye_voprosy
+- utter_error_handoff
+- utter_first_greet
+- utter_farewell
+- utter_sprashivaem_vopros
+entities:
+- LOC
+- origin
+- destination
+- helpseeker
+- disease
+- region
+intents:
+- affirm
+- appreciation
+- appreciation+deny
+- appreciation+farewell
+- deny
+- farewell
+- greet
+- handoff
+- nlu_fallback
+- out_of_scope
+- start
+- stop
+responses:
+  utter_appreciation_reply:
+  - text: Если будут вопросы, мы на связи!
+  - text: Удачи! Если возникнут вопросы, будем рады помочь :)
+  - text: Берегите себя! Если возникнут вопросы, просто напишите в бот — мы на связи :)
+  - text: Спасибо за обращение! Сохраните наш бот, чтобы быть с нами на связи в нужный момент :)
+  utter_greet:
+  - text: Привет
+  utter_first_greet:
+  - text: Привет, это официальный бот проекта «Наш проект». Мы <описание проекта>.
+  - text: Привет
+  utter_ask_how_we_can_help:
+  - text: 'Чем мы можем вам помочь? Напишите, пожалуйста, коротко, например: <пример вопроса>'
+  - text: 'Чем мы можем вам помочь? Напишите, пожалуйста, коротко, например: <другой пример вопроса>'
+  utter_handoff_is_working_time:
+  - text: Переводим вас в очередь к консультантам
+  utter_handoff_out_of_office:
+  - text: Переводим вас в очередь к консультантам. Наши консультанты работают на линии с 10 до 22 по Москве, мы обязательно ответим вам утром :)
+  utter_ask_more_details:
+  - text: Пока консультант подключается, опишите вашу ситуацию подробнее — так мы сможем помочь вам быстрее!
+  utter_what_type_of_consultation:
+  - text: Уточните, пожалуйста, по какому вопросу вам нужна консультация
+  utter_last_topic_check:
+  - text: Можем ли мы еще чем-то вам помочь?
+  utter_offer_of_help_clarification:
+  - text: Какой у вас вопрос?
+  utter_well_wish:
+  - text: Всего доброго! Если что, обращайтесь
+  utter_farewell:
+  - text: 👍
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: false

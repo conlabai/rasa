@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ path }}</title>
+        <style>
+            table { width: 100%; }
+            td { width: 25%; }
+        </style>
+    </head>
+
+    <body>
+        <h1>{{ path }}</h1>
+        <hr/>
+        <table>
+            {% if path != '.' %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('serve', path=parent_path) | replace('%5C', '/') }}">..{{ sep }}</a>
+                </td>
+            </tr>
+            {% endif %}
+            {% for entry in entries %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('serve', path=entry.rel_path) | replace('%5C', '/') }}">
+                        {{ entry.name|truncate(50, True) }}{% if entry.is_dir %}{{ sep }}{% endif %}
+                    </a>
+                </td>
+                <td>{{ entry.created_time }}</td>
+                <td>{{ entry.modified_time }}</td>
+                <td>{{ entry.size }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <hr/>
+    </body>
+</html>

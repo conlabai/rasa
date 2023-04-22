@@ -1,0 +1,15 @@
+version: "3.1"
+rules:
+- rule: Уточнаяем на какую тему нужна консультация
+  steps:
+  - intent: консультация
+  - action: utter_what_type_of_consultation
+- rule: спрашиваем какой вопрос если человек ответил что у него остались вопросы
+  steps:
+  - action: utter_last_topic_check
+  - intent: affirm
+  - action: utter_offer_of_help_clarification
+- rule: Стоп
+  steps:
+  - intent: stop
+  - action: action_listen

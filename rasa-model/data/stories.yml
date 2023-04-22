@@ -1,0 +1,51 @@
+version: "3.1"
+stories:
+- story: appreciation
+  steps:
+  - intent: appreciation
+  - action: utter_appreciation_reply
+  - intent: appreciation
+  - action: utter_farewell
+  - intent: appreciation
+- story: handoff
+  steps:
+  - checkpoint: handoff
+  - action: action_handoff_notification
+  - action: action_handoff
+- story: прощаемся
+  steps:
+  - action: utter_last_topic_check
+  - or:
+    - intent: deny
+    - intent: appreciation+deny
+  - action: utter_well_wish
+  - or:
+    - intent: farewell
+    - intent: appreciation+farewell
+  - action: utter_farewell
+- story: Приветствие первое обращение
+  steps:
+  - intent: start
+  - action: utter_first_greet
+  - action: utter_ask_how_we_can_help
+  - checkpoint: greeted
+- story: Приветсвие повторное
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - action: utter_ask_how_we_can_help
+- story: deny после приветсвия. TODO задать уточяющий вопрос
+  steps:
+  - intent: start
+  - action: utter_first_greet
+  - action: utter_ask_how_we_can_help
+  - intent: deny
+  - action: action_handoff_notification
+  - action: action_handoff
+- story: переводим оператору если nlu_fallback
+  steps:
+  - or:
+    - intent: nlu_fallback
+    - intent: handoff
+  - action: action_handoff_notification
+  - action: action_handoff

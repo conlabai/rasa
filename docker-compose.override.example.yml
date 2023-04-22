@@ -1,0 +1,15 @@
+# Rename this file to docker-compose.override.yml
+# This file is processed after docker-compose.yml and defines local overrides
+# name: rasa-chatwoot-myuser
+# services:
+#   postgres:
+#     hostname: rasa-postgres
+#     image: postgres:14.4
+#     volumes:
+#       - pgdata_dbt:/var/lib/postgresql/data
+    
+# networks:
+#   default:
+#     name: rasa-myuser
+# volumes:
+#   pgdata_myuser:

@@ -1,0 +1,100 @@
+version: "3.8"
+
+name: rasa-chatwoot
+
+services:
+
+  rasa:
+    image: conlab/rasa:chatwoot
+    build: rasa-server
+    profiles: ["build_only"]
+
+  rasa-gpu:
+    image: conlab/rasa:chatwoot-gpu
+    build: 
+      context: rasa-server
+      dockerfile: Dockerfile.gpu
+    profiles: ["build_only"]
+
+  rasa-models:
+    image: conlab/rasa-model-server:develop
+    build: rasa-model-server
+    environment:
+      - API_KEY=${MODEL_SERVER_API_KEY}
+      - PORT=${MODEL_SERVER_PORT}
+      - MODELS_DIR
+      - DEBUG=${MODEL_SERVER_DEBUG}
+    networks:
+      - default
+    volumes:
+      - ./rasa-model/models:/app/models
+
+  rasa-actions:
+    image: conlab/rasa-action-server:chatwoot
+    build: rasa-action-server
+    environment:
+      - CHATWOOT_API_KEY
+      - CHATWOOT_URL
+      - DD_SERVICE=rasa-аctions
+      - DD_ENV
+      - DD_PROFILING_ENABLED
+      - DD_APM_ENABLED
+      - DD_TRACE_AGENT_PORT
+      - DD_AGENT_HOST
+      # - ACTION_SERVER_SANIC_WORKERS=4
+    # entrypoint: ["ddtrace-run", "python"]
+    entrypoint: ["python"]
+    command: [ "-m", "rasa_sdk", "--actions", "actions", "-vv" ]
+    networks:
+      - default
+
+  rasa-nlg:
+    image: conlab/rasa-nlg-server:develop
+    build: rasa-nlg-server
+    # depends_on: [rasa]
+    environment:
+      - RASA_URL
+      - CHATWOOT_URL
+      - CHATWOOT_API_KEY
+      - NLG_DEBUG
+      - NLG_CHATWOOT_REFRESH_SECONDS
+      - NLG_DOMAIN_PATH=/app/domain.yml
+      - DD_SERVICE=rasa-nlg
+      - DD_ENV
+      - DD_PROFILING_ENABLED
+      - DD_APM_ENABLED
+      - DD_TRACE_AGENT_PORT
+      - DD_AGENT_HOST
+    labels:
+      - com.datadoghq.tags.env=dev
+      - com.datadoghq.tags.service=rasa-nlg
+      - com.datadoghq.tags.version=1.0
+    # entrypoint: ["ddtrace-run", "python"]
+    entrypoint: ["python"]
+    command: ["nlg_server.py", "--workers", "4"]
+    networks:
+      - default
+    volumes:
+      - ./rasa-model/domain.yml:/app/domain.yml
+
+  postgres:
+    hostname: rasa-postgres
+    image: postgres:14.4
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_DB
+      - POSTGRES_PASSWORD
+    networks:
+      - default
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    
+  redis:
+    image: redis:latest
+
+configs:
+  endpoints:
+    file: endpoints.yml
+
+volumes:
+  pgdata:
