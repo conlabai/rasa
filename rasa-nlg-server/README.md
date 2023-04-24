@@ -1,4 +1,7 @@
-# rasa-idl-nlg
+# rasa-nlg-server
+
+This is an optional server you can use to do additional processing on Natural Language Generation.
+The example nlg server here supports using canned responses from Chatwoot.
 
 ## Environment variables
 

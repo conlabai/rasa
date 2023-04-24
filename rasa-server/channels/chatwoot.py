@@ -1,19 +1,8 @@
-import asyncio
-import json
 import logging
 from copy import deepcopy
 from sanic import Blueprint, response
 from sanic.request import Request
 from sanic.response import HTTPResponse
-# from aiogram.types import (
-#     InlineKeyboardButton,
-#     Update,
-#     InlineKeyboardMarkup,
-#     KeyboardButton,
-#     ReplyKeyboardMarkup,
-#     Message,
-# )
-# from aiogram.utils.exceptions import TelegramAPIError
 from typing import Dict, Text, Any, List, Optional, Callable, Awaitable
 
 from rasa.core.channels.channel import InputChannel, UserMessage, OutputChannel
@@ -285,9 +274,4 @@ class ChatwootInput(InputChannel):
         
         return chatwoot_webhook
 
-    # def get_output_channel(self) -> ChatwootOutput:
-    #     """Loads the chatwoot channel."""
-    #     channel = ChatwootOutput(self.callback_endpoint)
-
-    #     return channel
-    
+# flake8: noqa: E501

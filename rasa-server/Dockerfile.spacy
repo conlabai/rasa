@@ -7,8 +7,9 @@ ARG PYVERSION
 USER root
 COPY requirements.txt .
 RUN python -m pip install --upgrade pip && \
-    python -m pip install -r requirements.txt
-
+    python -m pip install -r requirements.txt && \
+    python -m spacy download ru_core_news_lg
+    
 # set workdir and copy data files from disk
 # note the latter command uses .dockerignore
 

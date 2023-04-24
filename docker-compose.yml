@@ -4,9 +4,18 @@ name: rasa-chatwoot
 
 services:
 
+  rasa-small:
+    image: conlab/rasa:chatwoot-small
+    build: 
+      context: rasa-server
+      dockerfile: Dockerfile
+    profiles: ["build_only"]
+
   rasa:
     image: conlab/rasa:chatwoot
-    build: rasa-server
+    build: 
+      context: rasa-server
+      dockerfile: Dockerfile.spacy
     profiles: ["build_only"]
 
   rasa-gpu:
