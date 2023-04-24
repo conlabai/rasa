@@ -2,7 +2,7 @@
 
 ## Contents of the repo
 
-This repo contains all components needed to run a Iditelesom Rasa stack. Every component lives inside its own subdirectory:
+This repo contains all components needed to run a Rasa stack. Every component lives inside its own subdirectory:
 
 1. rasa-server: the Rasa server with the Chatwoot channel
 1. rasa-model-server: the Rasa model server - serving models to Rasa service
