@@ -18,6 +18,11 @@ def require_apikey(view_function):
     @wraps(view_function)
     # the new, post-decoration function. Note *args and **kwargs here.
     def decorated_function(*args, **kwargs):
+        # we accept the API key as a query parameter 'token'
+        token = request.args.get('token', None)
+        if token and token == API_KEY:
+            return view_function(*args, **kwargs)
+        # otherwize we try to get the API key from the header
         if request.headers.get(API_KEY_HEADER) and request.headers.get(API_KEY_HEADER) == API_KEY:
             return view_function(*args, **kwargs)
         else:
