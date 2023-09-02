@@ -11,8 +11,8 @@ COPY ./requirements.txt .
 
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-RUN useradd 1001 || mkdir models || chown 1001 models
-USER 1001
+RUN useradd 1000 || mkdir models || chown -R 1000 models
+USER 1000
 
 COPY . .
 
