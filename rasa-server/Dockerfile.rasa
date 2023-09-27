@@ -1,0 +1,31 @@
+# Python version we use
+FROM rasa/rasa:3.6.10
+
+# install dependencies of interest
+USER root
+COPY requirements.txt .
+RUN python -m pip install --upgrade pip && \
+    python -m pip install spacy==3.6 && \
+    python -m spacy download ru_core_news_lg
+    
+# set workdir and copy data files from disk
+# note the latter command uses .dockerignore
+
+WORKDIR /app
+ENV HOME=/app
+
+COPY . .
+
+# make sure the container process can write to .rasa directory
+RUN mkdir .rasa || true
+RUN mkdir models || true
+RUN mkdir .config || true
+RUN chown 1000 .rasa models .config
+# set the user to run, don't run as root
+USER 1000
+
+# set entrypoint for interactive shells
+ENTRYPOINT ["rasa"]
+
+# command to run when container is called to run
+CMD ["run", "--enable-api", "--port", "8080"]
