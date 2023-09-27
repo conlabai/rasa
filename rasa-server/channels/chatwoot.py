@@ -29,16 +29,20 @@ class ChatwootOutput(OutputChannel):
         self.conversation_id = conversation_id
         super().__init__()
 
-    async def send_message(self, recipient_id: Text, text: Text) -> None:
+    async def send_message(self, recipient_id: Text, text: Text, reply_markup: Dict = None) -> None:
         path = f'/api/v1/accounts/{self.account_id}/conversations/{self.conversation_id}'
-        logger.debug(f'send_message: recipient_id: {recipient_id}, text: {text}, path: {path}')
+        logger.debug(f'send_message: recipient_id: {recipient_id}, text: {text}, reply_markup: {reply_markup}, path: {path}')
         try:
             # await self.callback_endpoint.request(
             #     "post", content_type="application/json", subpath=f'{path}/toggle_typing_status?typing_status=on'
             # )
+            if reply_markup:
+                payload = reply_markup
+            else:
+                payload = {'content': text}
             await self.callback_endpoint.request(
                 "post", content_type="application/json", subpath=f'{path}/messages', 
-                json={'content': text}
+                json=payload
             )
             # await self.callback_endpoint.request(
             #     "post", content_type="application/json", subpath=f'{path}/toggle_typing_status?typing_status=off'
@@ -71,52 +75,42 @@ class ChatwootOutput(OutputChannel):
         button_type: Optional[Text] = "inline",
         **kwargs: Any,
     ) -> None:
-        """Sends a message with keyboard.
+        """Sends a message with an input selection.
 
-        For more information: https://core.telegram.org/bots#keyboards
+        For more information: https://www.chatwoot.com/docs/product/others/interactive-messages
 
-        :button_type inline: horizontal inline keyboard
+        :button_type: only inline
 
-        :button_type vertical: vertical inline keyboard
-
-        :button_type reply: reply keyboard
         """
-        if button_type == "inline":
-            reply_markup = InlineKeyboardMarkup()
-            button_list = [
-                InlineKeyboardButton(s["title"], callback_data=s["payload"])
-                for s in buttons
-            ]
-            reply_markup.row(*button_list)
-
-        elif button_type == "vertical":
-            reply_markup = InlineKeyboardMarkup()
-            [
-                reply_markup.row(
-                    InlineKeyboardButton(s["title"], callback_data=s["payload"])
-                )
-                for s in buttons
-            ]
-
-        elif button_type == "reply":
-            reply_markup = ReplyKeyboardMarkup(
-                resize_keyboard=False, one_time_keyboard=True
-            )
-            # drop button_type from button_list
-            button_list = [b for b in buttons if b.get("title")]
-            for idx, button in enumerate(buttons):
-                if isinstance(button, list):
-                    reply_markup.add(KeyboardButton(s["title"]) for s in button)
-                else:
-                    reply_markup.add(KeyboardButton(button["title"]))
-        else:
+        logger.debug(f'Generating button message, text: {text}, button_type: {button_type}, buttons: {buttons}')
+        if button_type != "inline":
             logger.error(
                 "Trying to send text with buttons for unknown "
                 "button type {}".format(button_type)
             )
             return
+# {
+#     "content": "Select one of the items below",
+#     "content_type": "input_select",
+#     "content_attributes": {
+#         "items": [
+#             { "title": "Option1", "value": "Option 1" },
+#             { "title": "Option2", "value": "Option 2" }
+#         ]
+#     },
+#     "private":false
+# }
 
-        await self.send_message(recipient_id, text, reply_markup=reply_markup)
+        reply_markup = {
+            "content": text,
+            "content_type": "input_select",
+            "content_attributes": {
+                "items": [{'title': btn['title'], 'value': btn['payload']} for btn in buttons]
+            },
+            "private": False
+        }
+
+        await self.send_message(recipient_id, "", reply_markup=reply_markup)
 
     async def send_custom_json(
         self, recipient_id: Text, json_message: Dict[Text, Any], **kwargs: Any
@@ -184,11 +178,15 @@ class ChatwootInput(InputChannel):
 
     @staticmethod
     def _is_valid_chatwoot_event(event: Dict[Text, Any]) -> bool:
-        message_type = event.get('message_type')
-        event_type = event.get('event')
-        status = event.get('conversation',{}).get('status')
-        return (message_type == "incoming" and event_type == "message_created"
-                and status == "pending")
+        try:
+            message_type = event.get('message_type')
+            event_type = event.get('event')
+            status = event.get('conversation',{}).get('status')
+            return (message_type == "incoming" and event_type == "message_created"
+                    and status == "pending")
+        except Exception as e:
+            logger.error(f"Invalid chatwoot event received, exception: {e}")
+            return False
 
     def get_metadata(self, request: Request) -> Optional[Dict[Text, Any]]:
         """Extracts additional information from the incoming request.
