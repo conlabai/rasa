@@ -1,7 +1,7 @@
 # Python version we use
 ARG PYVERSION=3.8
 # the tensorflow gpu image we use (tf version needs to match rasa version!)
-FROM tensorflow/tensorflow:2.8.4-gpu 
+FROM tensorflow/tensorflow:2.12.0-gpu 
 ARG PYVERSION
 
 # install dependencies of interest
@@ -18,8 +18,7 @@ WORKDIR /app
 ENV HOME=/app
 
 COPY . .
-# patch validator so it doesn't fail on utterances with no template
-# COPY ./validator.py /usr/local/lib/python${PYVERSION}/dist-packages/rasa/validator.py
+ADD channels channels
 
 # make sure the container process can write to .rasa directory
 RUN mkdir .rasa || true
