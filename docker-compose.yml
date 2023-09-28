@@ -15,7 +15,7 @@ services:
     image: conlab/rasa:chatwoot
     build: 
       context: rasa-server
-      dockerfile: Dockerfile.rasa
+      dockerfile: Dockerfile.spacy
     profiles: ["build_only"]
 
   rasa-gpu:
@@ -70,8 +70,7 @@ services:
 
   postgres:
     hostname: rasa-postgres
-    # image: postgres:14.4
-    image: arm64v8/postgres:14
+    image: postgres:14.4
     environment:
       - POSTGRES_USER
       - POSTGRES_DB
