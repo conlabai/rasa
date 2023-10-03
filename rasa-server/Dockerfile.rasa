@@ -1,16 +1,13 @@
 # Python version we use
-ARG PYVERSION=3.8
-# the tensorflow gpu image we use (tf version needs to match rasa version!)
-FROM tensorflow/tensorflow:2.12.0-gpu 
-ARG PYVERSION
+FROM rasa/rasa:3.6.10
 
 # install dependencies of interest
 USER root
 COPY requirements.txt .
 RUN python -m pip install --upgrade pip && \
-    python -m pip install -r requirements.txt && \
+    python -m pip install spacy==3.6 && \
     python -m spacy download ru_core_news_lg
-
+    
 # set workdir and copy data files from disk
 # note the latter command uses .dockerignore
 
@@ -18,13 +15,12 @@ WORKDIR /app
 ENV HOME=/app
 
 COPY . .
-ADD channels channels
 
 # make sure the container process can write to .rasa directory
 RUN mkdir .rasa || true
 RUN mkdir models || true
 RUN mkdir .config || true
-RUN chown -R 1000 .rasa models .config
+RUN chown 1000 .rasa models .config
 # set the user to run, don't run as root
 USER 1000
 

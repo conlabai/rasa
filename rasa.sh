@@ -9,6 +9,9 @@ docker run -it \
 --env-file .env \
 -v $(pwd)/rasa-model:/app \
 -v $(pwd)/endpoints.yml:/app/endpoints.yml \
+-v $(pwd)/rasa-server/credentials.yml:/app/credentials.yml \
+-v $(pwd)/rasa-server/channels:/app/channels \
 --network rasa-chatwoot_default \
 --entrypoint bash \
+-p 5005:5005 \
 conlab/rasa:chatwoot-gpu
